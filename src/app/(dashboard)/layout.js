@@ -1,9 +1,10 @@
+'use client'
 import MobileHeader from '@/src/components/MobileHeader'
 import MobileMenubar from '@/src/components/MobileMenubar'
 import Navbar from '@/src/components/Navbar'
 import NotesButtons from '@/src/components/NotesButtons'
-import Tags from '@/src/components/Tags'
 import TagsWrapper from '@/src/components/TagsWrapper'
+import { NotesProvider } from '@/src/context/NotesContext'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -12,6 +13,7 @@ export default function DashboardLayout({ children, searchParams }) {
   
    
   return (
+    <NotesProvider>
     <div className="h-screen flex">
       {/* Left Side: Visible only on large screens */}
       <div className="hidden lg:block lg:w-[16%] p-4 border-r border-r-gray-300 overflow-scroll h-full">
@@ -49,5 +51,6 @@ export default function DashboardLayout({ children, searchParams }) {
         </div>
       </div>
     </div>
+    </NotesProvider>
   );
 }

@@ -6,7 +6,7 @@ import List from '@/src/components/List';
 import ViewNote from '@/src/components/ViewNote';
 import ButtonsSection from '@/src/components/ButtonsSection';
 import Tags from '@/src/components/Tags';
-import { testData } from '@/src/library/data';
+
 
 function UserPage() {
   const searchParams = useSearchParams();
@@ -35,7 +35,7 @@ function UserPage() {
       {/* Desktop Layout: Three-column view for large screens */}
       <div className="hidden lg:flex flex-row h-full">
         {/* Left Column: List (1/4 of the screen) */}
-        <div className="w-1/4 overflow-scroll">
+        <div className="w-1/4 overflow-scroll border-r border-r-gray-300">
           <List keyword={keyword} onSelectNote={handleSelectNote} />
         </div>
         {/* Middle Column: Note Detail (2/4 of the screen) */}

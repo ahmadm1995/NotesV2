@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { testData } from "@/src/library/data";
+
+import { useNotes } from '../context/NotesContext';
 
 function List({ keyword, onSelectNote }) {
   console.log('RUNNING');
 
   const router = useRouter();
   const searchParams = useSearchParams();
+  const {notes} = useNotes()
   
   const tag = searchParams.get("tag") || ""; // Extract the tag parameter from URL
   const query = searchParams.get("query") || ""; // Extract search query
@@ -43,20 +45,20 @@ function List({ keyword, onSelectNote }) {
   // ✅ FIX: Ensure searchTerm filters correctly if search is active
   const filteredNotes =
     isSearchActive && searchTerm // ✅ Apply search filter when active
-      ? testData.filter((item) =>
+      ? notes.filter((item) =>
           item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.tags.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase())) // Search in tags too
         )
       : keyword === "archive"
-      ? testData.filter((item) => 
+      ? notes.filter((item) => 
           item.archived && 
           (tag ? item.tags.some((t) => t.toLowerCase() === tag.toLowerCase()) : true)
         )
       : keyword === "all"
-      ? testData.filter((item) => 
+      ? notes.filter((item) => 
           tag ? item.tags.some((t) => t.toLowerCase() === tag.toLowerCase()) : true
         )
-      : testData.filter((item) =>
+      : notes.filter((item) =>
           item.tags.some((t) => t.toLowerCase() === keyword.toLowerCase())
         );
 

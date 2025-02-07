@@ -2,12 +2,15 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { testData } from '../library/data';
+
+import { useNotes } from '../context/NotesContext';
 
 function Tags() {
   console.log('running in TAGS')
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
+  const {notes} = useNotes()
+
   let keyword = searchParams.get("keyword") || "all";
   const currentTag = searchParams.get("tag") || null;
 
@@ -23,8 +26,8 @@ function Tags() {
 
   // Extract only archived notes' tags if in archive mode
   const relevantNotes = isArchive
-    ? testData.filter(note => note.archived)
-    : testData;
+    ? notes.filter(note => note.archived)
+    : notes;
 
   // Extract all unique tags from the selected notes
   const allTags = [...new Set(relevantNotes.flatMap(note => note.tags))].sort();
