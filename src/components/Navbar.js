@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import { FiSearch } from 'react-icons/fi'
 import { useRouter, useSearchParams } from "next/navigation";
 
 function Navbar() {
@@ -47,7 +48,8 @@ function Navbar() {
         {/* Desktop Search Bar */}
         <div className="relative w-[300px] mr-4">
           <span className="absolute inset-y-0 left-3 flex items-center">
-            <Image src="/icon-search.svg" alt="Search Icon" width={32} height={32} />
+            {/* <Image src="/icon-search.svg" alt="Search Icon" width={25} height={25} /> */}
+            <FiSearch className="text-gray-300" size={25} />
           </span>
           <input
             type="text"
@@ -57,7 +59,7 @@ function Navbar() {
             onChange={handleSearchChange}
           />
         </div>
-        <Image src="/icon-settings.svg" alt="Settings Icon" width={32} height={32} />
+        <Image src="/icon-settings.svg" alt="Settings Icon" width={25} height={25} />
       </div>
     </div>
   );

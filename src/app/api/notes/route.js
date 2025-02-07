@@ -22,7 +22,7 @@ export const GET = async (request) => {
   }
 };
 
-// Create Notes
+// POST - Create Notes
 export const POST = async (request) => {
   const session = await getServerSession(authOptions);
   
@@ -30,10 +30,10 @@ export const POST = async (request) => {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { title, content, tags } = await request.json();
+  const { name, body, tags } = await request.json();
 
-  if (!title || !content) {
-    return new NextResponse("Title and content are required", { status: 400 });
+  if (!name || !body) {
+    return new NextResponse("Title and body are required", { status: 400 });
   }
 
   await connect();
@@ -41,18 +41,20 @@ export const POST = async (request) => {
   try {
     const newNote = new Note({
       userId: session.user.id,
-      title,
-      content,
-      tags: tags || [],         // Optional tags
-      archived: false,          // Default to not archived
+      name,
+      body,
+      tags: tags || [],
+      archived: false,
     });
 
     await newNote.save();
-    return new NextResponse("Note created successfully", { status: 201 });
+    return new NextResponse(JSON.stringify(newNote), { status: 201 });
   } catch (error) {
+    console.error('Error creating note:', error);
     return new NextResponse("Failed to create note", { status: 500 });
   }
 };
+
 
 // Update Notes
 export const PATCH = async (request) => {

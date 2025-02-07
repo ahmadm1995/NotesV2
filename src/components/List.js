@@ -3,8 +3,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useNotes } from '../context/NotesContext';
+import CreateNoteButton from "./CreateNoteButton";
 
-function List({ keyword, onSelectNote }) {
+function List({ keyword, onSelectNote, onCreateNote  }) {
   console.log('RUNNING');
 
   const router = useRouter();
@@ -65,7 +66,7 @@ function List({ keyword, onSelectNote }) {
   console.log("Filtered Notes:", filteredNotes);
 
   return (
-    <div>
+    <div className="ml-4 mr-8">
       {/* ✅ Mobile Search Bar (only visible when search=true) */}
       {isSearchActive && (
         <div className="p-2 sticky top-0 z-10 lg:hidden">
@@ -81,7 +82,7 @@ function List({ keyword, onSelectNote }) {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4 mt-4">
         {isSearchActive
           ? "Search Results"
           : keyword === "archive" && tag
@@ -94,6 +95,8 @@ function List({ keyword, onSelectNote }) {
       </h1>
 
       {filteredNotes.length === 0 && <p className="text-gray-600">No notes found for this filter.</p>}
+
+      <CreateNoteButton onClick={onCreateNote} />
 
       {filteredNotes.map((item, index) => (
         <div
