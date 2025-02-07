@@ -1,9 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
-import connect from "@/utils/db";
-import Note from "@/models/Note";
+import connect from "@/src/utils/db";
+import Note from "@/src/models/Note";
 import { NextResponse } from "next/server";
-
 
 // Get the Notes
 export const GET = async (request) => {
@@ -31,7 +30,7 @@ export const POST = async (request) => {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const { title, content } = await request.json();
+  const { title, content, tags } = await request.json();
 
   if (!title || !content) {
     return new NextResponse("Title and content are required", { status: 400 });
@@ -44,6 +43,8 @@ export const POST = async (request) => {
       userId: session.user.id,
       title,
       content,
+      tags: tags || [],         // Optional tags
+      archived: false,          // Default to not archived
     });
 
     await newNote.save();
@@ -53,3 +54,76 @@ export const POST = async (request) => {
   }
 };
 
+// Update Notes
+export const PATCH = async (request) => {
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const { id, title, content, tags, archived } = await request.json();
+
+  if (!id) {
+    return new NextResponse("Note ID is required", { status: 400 });
+  }
+
+  await connect();
+
+  try {
+    const updatedNote = await Note.findOneAndUpdate(
+      { _id: id, userId: session.user.id },  // Ensure the note belongs to the user
+      { 
+        ...(title && { title }),
+        ...(content && { content }),
+        ...(tags && { tags }),
+        ...(archived !== undefined && { archived })
+      },
+      { new: true }  // Return the updated document
+    );
+        console.log("Updated Note in DB:", updatedNote);  // Log after updating
+
+
+    if (!updatedNote) {
+      return new NextResponse("Note not found", { status: 404 });
+    }
+
+    return new NextResponse(JSON.stringify(updatedNote), { status: 200 });
+  } catch (error) {
+    console.error("Error updating note:", error);
+    return new NextResponse("Failed to update note", { status: 500 });
+  }
+};
+
+// Delete Note
+export const DELETE = async (request) => {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  const { id } = await request.json();  // Get note ID from request body
+
+  if (!id) {
+    return new NextResponse("Note ID is required", { status: 400 });
+  }
+
+  await connect();
+
+  try {
+    const deletedNote = await Note.findOneAndDelete({
+      _id: id,
+      userId: session.user.id,  // Ensure the note belongs to the logged-in user
+    });
+
+    if (!deletedNote) {
+      return new NextResponse("Note not found", { status: 404 });
+    }
+
+    return new NextResponse("Note deleted successfully", { status: 200 });
+  } catch (error) {
+    console.error("Error deleting note:", error);
+    return new NextResponse("Failed to delete note", { status: 500 });
+  }
+};

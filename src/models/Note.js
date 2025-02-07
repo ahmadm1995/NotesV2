@@ -6,7 +6,7 @@ const noteSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",  // Reference to the User model
+      ref: "User",
       required: true,
     },
     name: {
@@ -14,7 +14,7 @@ const noteSchema = new Schema(
       required: true,
     },
     tags: {
-      type: [String],  // Array of strings
+      type: [String],
       default: [],
     },
     lastEdited: {
@@ -25,12 +25,13 @@ const noteSchema = new Schema(
       type: String,
       required: true,
     },
-    archive: {
+    archived: {  // Make sure this is the only archive-related field
       type: Boolean,
-      default: false,  // Notes are not archived by default
+      default: false,
     },
   },
-  { timestamps: true }  // Automatically adds createdAt and updatedAt
+  { timestamps: true }
 );
+
 
 export default mongoose.models.Note || mongoose.model("Note", noteSchema);

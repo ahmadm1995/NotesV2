@@ -1,74 +1,69 @@
 import NextAuth from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import bcrypt from "bcryptjs";
+import GithubProvider from "next-auth/providers/github";
 import User from "@/src/models/User";
 import connect from "@/src/utils/db";
+import bcrypt from "bcryptjs";
 
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
-      id: "credentials",
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         await connect();
-        try {
-          const user = await User.findOne({ email: credentials.email });
-          if (user) {
-            const isPasswordCorrect = await bcrypt.compare(
-              credentials.password,
-              user.password
-            );
-            if (isPasswordCorrect) {
-              return user;
-            }
-          }
-          return null;  // Return null if authentication fails
-        } catch (err) {
-          throw new Error("Error authorizing user");
-        }
+
+        const user = await User.findOne({ email: credentials.email });
+        if (!user) throw new Error("No user found with this email");
+
+        const isPasswordCorrect = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isPasswordCorrect) throw new Error("Incorrect password");
+
+        return user;
       },
     }),
-    GithubProvider({
-      clientId: process.env.GITHUB_ID || "",
-      clientSecret: process.env.GITHUB_SECRET || "",
-    }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID || "",
-      clientSecret: process.env.GOOGLE_SECRET || "",
+      clientId: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
-  
+
+  // Ensure user ID is added to the session
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "credentials") {
-        return true;
+    async session({ session }) {
+      await connect();
+
+      const dbUser = await User.findOne({ email: session.user.email });
+
+      // Debugging logs
+      console.log("Session Email:", session.user.email);
+      console.log("DB User Found:", dbUser);
+
+      if (dbUser) {
+        session.user.id = dbUser._id.toString();  // Attach the user ID to the session
+        console.log("User ID added to session:", session.user.id);
+      } else {
+        session.user.id = null;
+        console.log("No user found in DB, User ID set to null");
       }
 
-      if (account?.provider === "github" || account?.provider === "google") {
-        await connect();
-        try {
-          const existingUser = await User.findOne({ email: user.email });
-          if (!existingUser) {
-            const newUser = new User({ email: user.email });
-            await newUser.save();
-          }
-          return true;
-        } catch (err) {
-          console.error("Error saving user", err);
-          return false;
-        }
-      }
-
-      return false;  // Default to false if no valid provider
+      return session;
     },
   },
+
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
