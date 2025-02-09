@@ -44,7 +44,7 @@ function Tags() {
   };
 
   return (
-    <div className="mt-2 overflow-scroll">
+    <div className="mt-2">
       <div className="mb-4 font-bold">{isArchive ? "Archived Tags" : "Tags"}</div>
       <div className="mt-2">
         {allTags.length === 0 ? (

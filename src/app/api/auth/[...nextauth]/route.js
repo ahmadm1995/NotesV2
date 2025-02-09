@@ -40,6 +40,12 @@ export const authOptions = {
     }),
   ],
 
+  session: {
+    strategy: "jwt",
+    maxAge: 120, //60 second timeout,
+    updateAge: 60,
+  },
+
   // Ensure user ID is added to the session
   callbacks: {
     async session({ session }) {

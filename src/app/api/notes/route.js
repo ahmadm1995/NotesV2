@@ -6,7 +6,10 @@ import { NextResponse } from "next/server";
 
 // Get the Notes
 export const GET = async (request) => {
+  const cookieHeader = request.headers.get('cookie')
+  console.log('Cookie received in GET ', cookieHeader)
   const session = await getServerSession(authOptions);
+  
   
   if (!session) {
     return new NextResponse("Unauthorized", { status: 401 });

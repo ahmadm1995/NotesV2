@@ -1,4 +1,5 @@
 'use client'
+import AutoRefresh from '@/src/components/AutoRefresh'
 import MobileHeader from '@/src/components/MobileHeader'
 import MobileMenubar from '@/src/components/MobileMenubar'
 import Navbar from '@/src/components/Navbar'
@@ -13,10 +14,12 @@ export default function DashboardLayout({ children, searchParams }) {
   
    
   return (
+    <>
+    <AutoRefresh />
     <NotesProvider>
     <div className="h-screen flex">
       {/* Left Side: Visible only on large screens */}
-      <div className="hidden lg:block lg:w-[16%] p-4 border-r border-r-gray-300 overflow-scroll h-full">
+      <div className="hidden lg:block lg:w-[16%] p-4 border-r border-r-gray-300 overflow-y-auto h-full">
         <Link 
           href="/"
           className="flex items-center justify-center lg:justify-start gap-2"
@@ -24,7 +27,7 @@ export default function DashboardLayout({ children, searchParams }) {
           <Image src="/logo.svg" alt="logo" width={100} height={100} />
         </Link>
         <NotesButtons />
-        <TagsWrapper className='h-full'/>
+        <TagsWrapper className='h-full '/>
       </div>
 
       {/* Right Side */}
@@ -52,5 +55,6 @@ export default function DashboardLayout({ children, searchParams }) {
       </div>
     </div>
     </NotesProvider>
+  </>
   );
 }
